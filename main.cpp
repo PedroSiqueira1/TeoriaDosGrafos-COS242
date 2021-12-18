@@ -14,6 +14,10 @@ class AdjMatrGraph{
     private:
     int N;
     int** AdjMat;
+    int min_degree;
+    int max_degree = 0;
+    vector<int> degrees;
+    double sum = 0; 
     string str;
 
     public:
