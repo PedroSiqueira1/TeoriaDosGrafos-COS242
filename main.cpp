@@ -226,6 +226,63 @@ public:
         cout << "A média dos graus é " << findMean() << '\n'; // Média calculada dividindo a soma dos vértices pelo número de vértices
         cout << "A mediana dos graus é " << findMedian() << '\n'; 
     }
+    
+        void BFS(int value){
+        //Lista de marcados em boolean
+        int k = 0;
+        visited = new bool[N];
+        map< string, map<int,int> >bfstree;
+        vector<int> vec;
+        vector<int> parent;
+        vector<int> level;
+        
+        for( int i = 0; i < N; i++){
+            visited[i] = 0;
+        }
+        //Marca a raiz como marcado
+        visited[value] = true;
+        //Cria a fila e coloca o valor na fila
+        list<int> Q;
+        list<int>::iterator i;
+        Q.push_back(value);
+        vec.push_back(value);
+        parent.push_back(0);
+        level.push_back(0);
+        
+        //Enquanto Q não estiver vazia
+        while(!Q.empty()){
+            //retira v de Q
+            int v = Q.front();
+            Q.pop_front();
+            k++;
+            
+            //para todo vizinho w de v:
+            for(i = L[v].begin(); i!=L[v].end(); i++){
+                int w = *i;
+                //Se não estiver nos visitados
+                if(!visited[w]){
+                    //Marca como visitado
+                     visited[w] = true;
+                     //Coloca no Q
+                     Q.push_back(w);
+                     //Coloca, respectivamente, o valor, o pai e o nível
+                     vec.push_back(w);
+                     parent.push_back(v);
+                     level.push_back(k);
+                }
+            }
+        }
+        int len = vec.size();
+        for(int i = 0; i < len; i++){
+            if (i < 1){
+               cout << "number: " << vec[i] << " / level:" << level[i] << " / parent: none" << endl;
+            }
+            if(i >= 1){
+                cout << "number: " << vec[i] << " / level:" << level[i] << " / parent: " << parent[i] << endl;
+            }
+        
+        }
+    }
 
 };
 
