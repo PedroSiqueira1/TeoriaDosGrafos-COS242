@@ -5,6 +5,7 @@
 #include <list>
 #include <vector>
 #include <algorithm>
+#include <map>
 
 
 using namespace std;
@@ -20,6 +21,7 @@ class AdjMatrGraph{
     vector<int> degrees;
     double sum = 0; 
     string str;
+    bool** visited;
 
    public:
         AdjMatrGraph(string str){
@@ -136,6 +138,7 @@ private:
     double sum = 0;
     string str;
     list<int> *L;
+    bool* visited;
 
 public:
     
@@ -227,7 +230,7 @@ public:
         cout << "A mediana dos graus é " << findMedian() << '\n'; 
     }
     
-        void BFS(int value){
+    void BFS(int value){
         //Lista de marcados em boolean
         int k = 0;
         visited = new bool[N];
@@ -265,7 +268,7 @@ public:
                      visited[w] = true;
                      //Coloca no Q
                      Q.push_back(w);
-                     //Coloca, respectivamente, o valor, o pai e o nível
+                     cout << w << " while v is:" << v << endl;
                      vec.push_back(w);
                      parent.push_back(v);
                      level.push_back(k);
@@ -287,20 +290,19 @@ public:
 };
 
 
-
 int main(){
 
-    string s = "6\n12\n13\n14\n15\n23\n24\n25\n34\n35\n45\n01";
-    int vertices;
+    string s = "6\n12\n13\n15\n24\n25\n35\n45\n01";
+    //int vertices;
     AdjListGraph g(s);
-    g.printList();
+    //g.printList();
     
-    g.find_degrees();
-
+    //g.find_degrees();
+    g.BFS(3);
+    
     std::ifstream myfile; 
     myfile.open("Grafo.txt");
     std::string myline;
     
     return 0;
 }
-
