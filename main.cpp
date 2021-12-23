@@ -15,13 +15,14 @@ class AdjMatrGraph{
     private:
     int N;
     int M;
-    int** AdjMat;
+    bool** AdjMat;
     int min_degree;
     int max_degree = 0;
     vector<int> degrees;
     double sum = 0; 
     string str;
     bool** visited;
+    map<int, bool> visitedDFS;
 
    public:
         AdjMatrGraph(string str){
@@ -29,9 +30,9 @@ class AdjMatrGraph{
             N = (int)str.at(0) - '0';
             this->M = 0;
             int len = str.length();
-            AdjMat = new int*[N];
+            AdjMat = new bool*[N];
             for(int i = 0; i < N; i++){
-                AdjMat[i] = new int[N];
+                AdjMat[i] = new bool[N];
                 for(int j = 0; j < N; j++){
                     AdjMat[i][j] = 0;
                 }
@@ -126,6 +127,7 @@ class AdjMatrGraph{
 
 
 
+
 };
 
 class AdjListGraph{
@@ -139,6 +141,7 @@ private:
     string str;
     list<int> *L;
     bool* visited;
+    map<int, bool> visitedDFS;
 
 public:
     
@@ -287,6 +290,22 @@ public:
         }
     }
 
+    void DFS(int v){
+
+        visitedDFS[v] = true;
+        cout << v << " ";
+
+        
+        // Recur for all the vertices adjacent
+        // to this vertex
+        list<int>::iterator i;
+        for (i = L[v].begin(); i != L[v].end(); ++i){
+            
+            if (!visitedDFS[*i]){
+                DFS(*i);
+            }
+        }
+    }
 };
 
 
@@ -295,10 +314,12 @@ int main(){
     string s = "6\n12\n13\n15\n24\n25\n35\n45\n01";
     //int vertices;
     AdjListGraph g(s);
-    //g.printList();
     
+    g.printList();
+    
+
     //g.find_degrees();
-    g.BFS(3);
+    g.DFS(3);
     
     std::ifstream myfile; 
     myfile.open("Grafo.txt");
