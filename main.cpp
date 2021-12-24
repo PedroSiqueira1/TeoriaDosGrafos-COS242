@@ -13,7 +13,6 @@ using namespace std;
 
 class AdjMatrGraph{
     private:
-    int N;
     int M;
     bool** AdjMat;
     int min_degree;
@@ -22,9 +21,10 @@ class AdjMatrGraph{
     double sum = 0; 
     string str;
     bool** visited;
-    map<int, bool> visitedDFS;
+     list<int> components;
 
-   public:
+    public:
+    int N;
         AdjMatrGraph(string str){
             this->str = str;
             N = (int)str.at(0) - '0';
@@ -125,6 +125,53 @@ class AdjMatrGraph{
         cout << "A mediana dos graus é " << findMedian() << '\n'; 
     }
 
+    void DFS(int v, bool visited[]){
+        components.push_back(v);
+        visited[v] = true;
+        //cout << v << " ";
+
+        
+        // Recur for all the vertices adjacent
+        // to this vertex
+        list<int>::iterator i;
+        for (int i = 0; i < N; i++){
+            
+            if (AdjMat[v][i] == 1 && !visited[i]){
+                DFS(i,visited);
+            }
+        }
+
+    }
+
+    void connectedComponents(){
+        // Mark all the vertices as not visited
+        int numcc = 0;
+        bool* visitedcc = new bool[N];
+        for (int v = 0; v < N; v++)
+            visitedcc[v] = false;
+    
+        for (int v = 0; v < N; v++) {
+            if (visitedcc[v] == false) {
+                // print all reachable vertices
+                // from v
+                numcc++;
+                DFS(v,visitedcc);
+                cout << "A componente tem " << components.size() << " vertices" <<"\n";
+                components.sort();
+                cout << "Componentes: ";
+                for (auto const &i: components) {
+                    cout << i << " ";
+                }
+                components.clear();
+
+
+                cout << "\n";
+            }
+        }
+        cout << "O grafo possui " << numcc << " componentes conexas";
+        delete[] visitedcc;
+    }
+
 
 
 
@@ -132,7 +179,7 @@ class AdjMatrGraph{
 
 class AdjListGraph{
 private:
-    int N;
+    
     int min_degree;
     int max_degree = 0;
     vector<int> degrees; 
@@ -143,10 +190,10 @@ private:
     bool* visited;
     int* parent;
     int* level;
-    map<int, bool> visitedDFS;
+    list<int> components;
 
 public:
-    
+    int N;
     AdjListGraph(string str){
         
         this-> str = str;
@@ -279,10 +326,9 @@ public:
         //}
     }
 
-    void DFS(int v){
-
-        visitedDFS[v] = true;
-        cout << v << " ";
+    void DFS(int v, bool visited[]){
+        components.push_back(v);
+        visited[v] = true;
 
         
         // Recur for all the vertices adjacent
@@ -290,10 +336,39 @@ public:
         list<int>::iterator i;
         for (i = L[v].begin(); i != L[v].end(); ++i){
             
-            if (!visitedDFS[*i]){
-                DFS(*i);
+            if (!visited[*i]){
+                DFS(*i, visited);
             }
         }
+    }
+
+    void connectedComponents(){
+        // Mark all the vertices as not visited
+        int numcc = 0;
+        bool* visitedcc = new bool[N];
+        for (int v = 0; v < N; v++)
+            visitedcc[v] = false;
+    
+        for (int v = 0; v < N; v++) {
+            if (visitedcc[v] == false) {
+                // print all reachable vertices
+                // from v
+                numcc++;
+                DFS(v,visitedcc);
+                cout << "A componente tem " << components.size() << " vertices" <<"\n";
+                components.sort();
+                cout << "Componentes: ";
+                for (auto const &i: components) {
+                    cout << i << " ";
+                }
+                components.clear();
+
+
+                cout << "\n";
+            }
+        }
+        cout << "O grafo possui " << numcc << " componentes conexas" << endl;
+        delete[] visitedcc;
     }
     
     void Distance(int n1, int n2){
@@ -330,13 +405,13 @@ public:
 
 int main(){
 
-    string s = "6\n12\n13\n15\n24\n25\n35\n45\n01";
+    string s = "8\n12\n13\n15\n24\n25\n35\n45\n01\n67";
     //int vertices;
     AdjListGraph g(s);
     
     g.printList();
     
-
+    g.connectedComponents();
     //g.find_degrees();
     g.Distance(4,3);
     g.Diameter();
