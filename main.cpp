@@ -274,11 +274,9 @@ public:
             }
         }
         
-        for(int i = 0; i < N; i++){
-            cout << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
-            
-        
-        }
+        //for(int i = 0; i < N; i++){
+        //    cout << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
+        //}
     }
 
     void DFS(int v){
@@ -297,8 +295,38 @@ public:
             }
         }
     }
+    
+    void Distance(int n1, int n2){
+        BFS(n1);
+        cout << "The distance between " << n1 << " and " << n2 << " is " << level[n2] << endl;
+    }
+    
+    void Diameter(){
+        int d = 0;
+        for(int i = 0; i < N; i++){
+            BFS(i);
+            for(int k = 0; k < N; k++){
+                if (level[k] > d){
+                    d = level[k];
+                }
+            }
+        }
+        cout << "The diameter is " << d << endl;
+    }
+    
+    void CheckLevel(int n){
+        cout << "The level of " << n << " is " << level[n] << endl;
+    }
+    
+    void CheckParent(int n){
+        cout << "The parent of " << n << " is " << parent[n] << endl;
+    }
 };
 
+//Para usar chame a BFS partindo da raiz que deseja.
+//Logo em seguida use CheckParent ou CheckLevel para ver o
+//pai ou o nível, respectivamente. Caso chame a BFS ou Diameter ou
+//distância este valor mudará.
 
 int main(){
 
@@ -310,9 +338,11 @@ int main(){
     
 
     //g.find_degrees();
-    g.DFS(3);
+    g.Distance(4,3);
+    g.Diameter();
     g.BFS(3);
-    
+    g.CheckLevel(3);
+    g.CheckParent(3);
     std::ifstream myfile; 
     myfile.open("Grafo.txt");
     std::string myline;
