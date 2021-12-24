@@ -65,7 +65,7 @@ class AdjMatrGraph{
                 x = nums[i];
                 int k = i + 1;
                 y = nums[k];
-                cout << x << " and " << y << endl;
+                //cout << x << " and " << y << endl;
                 AdjMat[x][y] = 1;
                 AdjMat[y][x] = 1;
             }
@@ -140,10 +140,6 @@ class AdjMatrGraph{
         }
         
 
-        cout << "O grau mínimo é " << min_degree<< '\n';
-        cout << "O grau máximo é " << max_degree<< '\n';
-        cout << "A média dos graus é " << findMean() << '\n'; // Média calculada dividindo a soma dos vértices pelo número de vértices
-        cout << "A mediana dos graus é " << findMedian() << '\n'; 
     }
     
         void DFS(int v, bool visited[]){
@@ -170,15 +166,26 @@ class AdjMatrGraph{
         bool* visitedcc = new bool[N];
         for (int v = 0; v < N; v++)
             visitedcc[v] = false;
-    
+        ofstream answer;
+        answer.open("Resposta.txt");
         for (int v = 0; v < N; v++) {
             if (visitedcc[v] == false) {
                 // print all reachable vertices
                 // from v
                 numcc++;
                 DFS(v,visitedcc);
+                
                 cout << "A componente tem " << components.size() << " vertices" <<"\n";
                 components.sort();
+                
+                if (answer.is_open()){
+                    answer << "A componente tem " << components.size() << " vertices" <<"\n";
+                    answer << "Componentes: ";
+                    for (auto const &i: components) {
+                        answer << i << " ";
+                    }
+                    answer << endl;
+                }
                 cout << "Componentes: ";
                 for (auto const &i: components) {
                     cout << i << " ";
@@ -188,9 +195,12 @@ class AdjMatrGraph{
 
                 cout << "\n";
             }
+        
         }
+        answer << "O grafo possui " << numcc << " componentes conexas";
         cout << "O grafo possui " << numcc << " componentes conexas";
         delete[] visitedcc;
+        
     }
         void BFS(int value){
         visitedbfs = new bool[N];
@@ -217,7 +227,7 @@ class AdjMatrGraph{
             //retira v de Q
             v = Q.front();
             Q.pop_front();
-            cout << v;
+            //cout << v;
             //para todo vizinho w de v:
             for(int i = 0; i < N+1; i++){
                 //Se não estiver nos0 visitados
@@ -231,10 +241,17 @@ class AdjMatrGraph{
                 }
             }
         }
-    
-        for(int i = 0; i < N; i++){
-            cout << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
-        }    
+
+        ofstream answer;
+        answer.open("Resposta.txt");
+        if (answer.is_open()){
+            for(int i = 0; i < N; i++){
+            answer << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
+            }
+        }
+        //for(int i = 0; i < N; i++){
+        //    cout << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
+        //}    
             
     }
     
@@ -281,8 +298,8 @@ private:
     bool* visited;
     int* parent;
     int* level;
-    vector<int> parentdfs;
-    vector<int> leveldfs;
+    int* parentdfs;
+    int* leveldfs;
     list<int> components;
 
 public:
@@ -384,10 +401,6 @@ public:
         }
         
 
-        cout << "O grau mínimo é " << min_degree<< '\n';
-        cout << "O grau máximo é " << max_degree<< '\n';
-        cout << "A média dos graus é " << findMean() << '\n'; // Média calculada dividindo a soma dos vértices pelo número de vértices
-        cout << "A mediana dos graus é " << findMedian() << '\n'; 
     }
     
     void BFS(int value){
@@ -429,17 +442,34 @@ public:
             }
         }
         
+        
+        ofstream answer;
+        answer.open("Resposta.txt");
+        if (answer.is_open()){
+            for(int i = 0; i < N; i++){
+            answer << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
+            }
+        }
+            
         for(int i = 0; i < N; i++){
             cout << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
         }
     }
 
     void DFS(int v, bool visited[]){
+        parentdfs = new int[N];
+        leveldfs = new int[N];
         components.push_back(v);
         visited[v] = true;
-        if (parentdfs.empty() == true){
-            parentdfs[v] = -1;
-            leveldfs[v] = 0; 
+        for(int i = 0; i < N; i++){
+            if (visited[i] != 0){
+                break;
+            }
+            parentdfs = new int[N];
+            leveldfs = new int[N];
+            parentdfs[v] = 0;
+            leveldfs[v] = 0;
+
         }  
 
         
@@ -464,6 +494,8 @@ public:
         for (int v = 0; v < N; v++){
             visitedcc[v] = false;
         }
+        ofstream answer;
+        answer.open("Resposta.txt");
     
         for (int v = 0; v < N; v++) {
             if (visitedcc[v] == false) {
@@ -473,20 +505,29 @@ public:
                 DFS(v,visitedcc);
                 cout << "A componente tem " << components.size() << " vertices" <<"\n";
                 components.sort();
+                if (answer.is_open()){
+                    answer << "A componente tem " << components.size() << " vertices" <<"\n";
+                    answer << "Componentes: ";
+                    for (auto const &i: components) {
+                        answer << i << " ";
+                    }
+                    answer << endl;
+                }
                 cout << "Componentes: ";
                 for (auto const &i: components) {
                     cout << i << " ";
                 }
                 components.clear();
-                parentdfs.clear();
-                leveldfs.clear();
+                
 
 
                 cout << "\n";
             }
         }
+        answer << "O grafo possui " << numcc << " componentes conexas";
         cout << "O grafo possui " << numcc << " componentes conexas" << endl;
         delete[] visitedcc;
+        
     }
     
     void Distance(int n1, int n2){
@@ -532,18 +573,19 @@ int main(){
 
     string s = "11\n11 10\n3 4\n 5 7\n10 2\n1 3\n1 11\n10 1";
 
-    //AdjMatrGraph g(s);
+    AdjMatrGraph g(s);
+    //AdjListGraph g(s);
     //g.printMat();
-    
-    //g.BFS(3);
-
-    AdjListGraph g(s);
     //g.printList();
+    
+
+    
+    
     //g.connectedComponents();
     //g.find_degrees();
     //g.Distance(4,3);
     //g.Diameter();
-    g.BFS(3);
+    //g.BFS(3);
     //g.CheckLevelBFS(3);
     //g.CheckParentDFS(3);
     std::ifstream myfile; 
