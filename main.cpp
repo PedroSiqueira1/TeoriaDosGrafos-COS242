@@ -6,6 +6,8 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+#include <iterator>
+
 
 
 using namespace std;
@@ -14,42 +16,61 @@ using namespace std;
 class AdjMatrGraph{
     private:
     int M;
-    bool** AdjMat;
+    int** AdjMat;
     int min_degree;
     int max_degree = 0;
     vector<int> degrees;
     double sum = 0; 
     string str;
     bool** visited;
-     list<int> components;
+    list<int> components;
+    bool* visitedbfs;
+    int* parent;
+    int* level;
 
     public:
     int N;
         AdjMatrGraph(string str){
             this->str = str;
-            N = (int)str.at(0) - '0';
             this->M = 0;
-            int len = str.length();
-            AdjMat = new bool*[N];
+            string s = str.substr(2);
+            //cout << s;
+            vector<int> nums;
+            
+            stringstream stream(str);
+            while(1) {
+               int n;
+               stream >> n;
+                if(!stream)
+                    break;
+                nums.push_back(n);
+            }
+
+            //int len = nums.size();
+            N = nums.at(0) + 1;
+            AdjMat = new int*[N];
             for(int i = 0; i < N; i++){
-                AdjMat[i] = new bool[N];
+                AdjMat[i] = new int[N];
                 for(int j = 0; j < N; j++){
                     AdjMat[i][j] = 0;
                 }
             }
-
-            for (int i=0; i < len; i++){
-                char c = str[i];
-                if (c == '\n' && i < (len-1)){
-                    M++;
-                    int x,y = 0;
-                    x = (int)str.at(i+1) - '0';
-                    y = (int)str.at(i+2) - '0';
-
-                    AdjMat[x][y] = 1;
-                    AdjMat[y][x] = 1;
-                }
+            int len = 0;
+            for (int element: nums){
+                len++; 
             }
+            cout << len;
+            int x,y = 0;
+            for(int i = 1; i < len; i = i + 2){
+                x = nums[i];
+                int k = i + 1;
+                y = nums[k];
+                cout << x << " and " << y << endl;
+                AdjMat[x][y] = 1;
+                AdjMat[y][x] = 1;
+            }
+            M = (len - 1)/2;
+            
 
         }
 
@@ -124,8 +145,8 @@ class AdjMatrGraph{
         cout << "A média dos graus é " << findMean() << '\n'; // Média calculada dividindo a soma dos vértices pelo número de vértices
         cout << "A mediana dos graus é " << findMedian() << '\n'; 
     }
-
-    void DFS(int v, bool visited[]){
+    
+        void DFS(int v, bool visited[]){
         components.push_back(v);
         visited[v] = true;
         //cout << v << " ";
@@ -171,9 +192,79 @@ class AdjMatrGraph{
         cout << "O grafo possui " << numcc << " componentes conexas";
         delete[] visitedcc;
     }
+        void BFS(int value){
+        visitedbfs = new bool[N];
+        parent = new int[N];
+        level = new int[N];
 
-
-
+        for( int i = 0; i < N; i++){
+            visitedbfs[i] = 0;
+            parent[i] = 0;
+            level[i] = 0;
+        }
+        //Marca a raiz como marcado
+        visitedbfs[value] = true;
+        parent[value] = -1;
+        level[value] = 0;
+        //Cria a fila e coloca o valor na fila
+        list<int> Q;
+        //list<int>::iterator i;
+        Q.push_back(value);
+        
+        int v;
+        //Enquanto Q não estiver vazia
+        while(!Q.empty()){
+            //retira v de Q
+            v = Q.front();
+            Q.pop_front();
+            cout << v;
+            //para todo vizinho w de v:
+            for(int i = 0; i < N+1; i++){
+                //Se não estiver nos0 visitados
+                if(visitedbfs[i] == 0 && AdjMat[v][i] == 1){
+                    //Marca como visitado
+                     visitedbfs[i] = true;
+                     //Coloca no Q
+                     Q.push_back(i);
+                     parent[i] = v;
+                     level[i] = level[v] + 1;
+                }
+            }
+        }
+    
+        for(int i = 0; i < N; i++){
+            cout << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
+        }    
+            
+    }
+    
+    void CheckLevel(int n){
+        cout << "The level of " << n << " is " << level[n] << endl;
+    }
+    
+    void CheckParent(int n){
+        cout << "The parent of " << n << " is " << parent[n] << endl;
+    }
+    
+    void Distance(int n1, int n2){
+        BFS(n1);
+        cout << "The distance between " << n1 << " and " << n2 << " is " << level[n2] << endl;
+    }
+    
+    void Diameter(){
+        int d = 0;
+        for(int i = 0; i < N; i++){
+            BFS(i);
+            for(int k = 0; k < N; k++){
+                if (level[k] > d){
+                    d = level[k];
+                }
+            }
+        }
+        cout << "The diameter is " << d << endl;
+    }
+    
+    
 
 };
 
@@ -197,27 +288,40 @@ private:
 public:
     int N;
     AdjListGraph(string str){
+        this->str = str;
+        this->M = 0;
+        string s = str.substr(2);
+        //cout << s;
+        vector<int> nums;
         
-        this-> str = str;
-        N = (int)str.at(0) - '0';
-        int len = str.length();
-        L = new list<int>[N];
-        for (int i=0; i < len; i++){
-            char c = str[i];
-            if (c == '\n' && i < (len-1)){
-                M++;
-                int x,y = 0;
-                x = (int)str.at(i+1) - '0';
-                y = (int)str.at(i+2) - '0';
-                L[x].push_back(y);
-                L[y].push_back(x);
-            }
+        stringstream stream(str);
+        while(1) {
+            int n;
+            stream >> n;
+            if(!stream)
+                break;
+            //Num.push_back(n);
+            nums.push_back(n);
         }
+        this-> str = str;
+        N = nums[0] + 1;
+        cout << N;
+        L = new list<int>[N];
+        int len = nums.size();
+        int x,y = 0;
+        for(int i = 1; i < len; i = i + 2){
+            x = nums[i];
+            int k = i + 1;
+            y = nums[k];
+            L[x].push_back(y);
+            L[y].push_back(x);
+        }
+        M = (len - 1)/2;
     }
 
 
     void printList(){
-        for(int i = 0; i < N; i++){
+        for(int i = 0; i < N+1; i++){
                 cout << "N: " << i << " -> | ";
             for(int x:L[i]){
                 cout << x <<" | ";
@@ -325,9 +429,9 @@ public:
             }
         }
         
-        //for(int i = 0; i < N; i++){
-        //    cout << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
-        //}
+        for(int i = 0; i < N; i++){
+            cout << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
+        }
     }
 
     void DFS(int v, bool visited[]){
@@ -403,11 +507,11 @@ public:
         cout << "The diameter is " << d << endl;
     }
     
-    void CheckLevel(int n){
+    void CheckLevelBFS(int n){
         cout << "The level of " << n << " is " << level[n] << endl;
     }
     
-    void CheckParent(int n){
+    void CheckParentBFS(int n){
         cout << "The parent of " << n << " is " << parent[n] << endl;
     }
     void CheckLevelDFS(int n){
@@ -426,18 +530,22 @@ public:
 
 int main(){
 
-    string s = "8\n12\n13\n15\n24\n25\n35\n45\n01\n67";
-    //int vertices;
-    AdjListGraph g(s);
+    string s = "11\n11 10\n3 4\n 5 7\n10 2\n1 3\n1 11\n10 1";
+
+    //AdjMatrGraph g(s);
+    //g.printMat();
     
-    g.printList();
-    g.connectedComponents();
+    //g.BFS(3);
+
+    AdjListGraph g(s);
+    //g.printList();
+    //g.connectedComponents();
     //g.find_degrees();
     //g.Distance(4,3);
     //g.Diameter();
-    //g.BFS(3);
-    g.CheckLevelDFS(3);
-    g.CheckParentDFS(3);
+    g.BFS(3);
+    //g.CheckLevelBFS(3);
+    //g.CheckParentDFS(3);
     std::ifstream myfile; 
     myfile.open("Grafo.txt");
     std::string myline;
