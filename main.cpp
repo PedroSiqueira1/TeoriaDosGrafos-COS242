@@ -190,6 +190,8 @@ private:
     bool* visited;
     int* parent;
     int* level;
+    vector<int> parentdfs;
+    vector<int> leveldfs;
     list<int> components;
 
 public:
@@ -218,10 +220,12 @@ public:
         for(int i = 0; i < N; i++){
                 cout << "N: " << i << " -> | ";
             for(int x:L[i]){
-                cout<<x<<" | ";
+                cout << x <<" | ";
             }
-            cout<<endl;
+            
+            cout << endl;
         }
+        
     }
     
     void numOfEdges(){
@@ -329,6 +333,10 @@ public:
     void DFS(int v, bool visited[]){
         components.push_back(v);
         visited[v] = true;
+        if (parentdfs.empty() == true){
+            parentdfs[v] = -1;
+            leveldfs[v] = 0; 
+        }  
 
         
         // Recur for all the vertices adjacent
@@ -337,17 +345,21 @@ public:
         for (i = L[v].begin(); i != L[v].end(); ++i){
             
             if (!visited[*i]){
+                parentdfs[*i] = v;
+                leveldfs[*i] = level[v] + 1;
                 DFS(*i, visited);
             }
         }
     }
 
     void connectedComponents(){
+        
         // Mark all the vertices as not visited
         int numcc = 0;
         bool* visitedcc = new bool[N];
-        for (int v = 0; v < N; v++)
+        for (int v = 0; v < N; v++){
             visitedcc[v] = false;
+        }
     
         for (int v = 0; v < N; v++) {
             if (visitedcc[v] == false) {
@@ -362,6 +374,8 @@ public:
                     cout << i << " ";
                 }
                 components.clear();
+                parentdfs.clear();
+                leveldfs.clear();
 
 
                 cout << "\n";
@@ -396,6 +410,13 @@ public:
     void CheckParent(int n){
         cout << "The parent of " << n << " is " << parent[n] << endl;
     }
+    void CheckLevelDFS(int n){
+        cout << "The level of " << n << " is " << leveldfs[n] << endl;
+    }
+    
+    void CheckParentDFS(int n){
+        cout << "The parent of " << n << " is " << parentdfs[n] << endl;
+    }
 };
 
 //Para usar chame a BFS partindo da raiz que deseja.
@@ -410,14 +431,13 @@ int main(){
     AdjListGraph g(s);
     
     g.printList();
-    
     g.connectedComponents();
     //g.find_degrees();
-    g.Distance(4,3);
-    g.Diameter();
-    g.BFS(3);
-    g.CheckLevel(3);
-    g.CheckParent(3);
+    //g.Distance(4,3);
+    //g.Diameter();
+    //g.BFS(3);
+    g.CheckLevelDFS(3);
+    g.CheckParentDFS(3);
     std::ifstream myfile; 
     myfile.open("Grafo.txt");
     std::string myline;
