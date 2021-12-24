@@ -141,6 +141,8 @@ private:
     string str;
     list<int> *L;
     bool* visited;
+    int* parent;
+    int* level;
     map<int, bool> visitedDFS;
 
 public:
@@ -234,34 +236,29 @@ public:
     }
     
     void BFS(int value){
-        //Lista de marcados em boolean
-        int k = 0;
         visited = new bool[N];
-        map< string, map<int,int> >bfstree;
-        vector<int> vec;
-        vector<int> parent;
-        vector<int> level;
-        
+        parent = new int[N];
+        level = new int[N];
+
         for( int i = 0; i < N; i++){
             visited[i] = 0;
+            parent[i] = 0;
+            level[i] = 0;
         }
         //Marca a raiz como marcado
         visited[value] = true;
+        parent[value] = -1;
+        level[value] = 0;
         //Cria a fila e coloca o valor na fila
         list<int> Q;
         list<int>::iterator i;
         Q.push_back(value);
-        vec.push_back(value);
-        parent.push_back(0);
-        level.push_back(0);
         
         //Enquanto Q não estiver vazia
         while(!Q.empty()){
             //retira v de Q
             int v = Q.front();
             Q.pop_front();
-            k++;
-            
             //para todo vizinho w de v:
             for(i = L[v].begin(); i!=L[v].end(); i++){
                 int w = *i;
@@ -271,21 +268,15 @@ public:
                      visited[w] = true;
                      //Coloca no Q
                      Q.push_back(w);
-                     cout << w << " while v is:" << v << endl;
-                     vec.push_back(w);
-                     parent.push_back(v);
-                     level.push_back(k);
+                     parent[w] = v;
+                     level[w] = level[v] + 1;
                 }
             }
         }
-        int len = vec.size();
-        for(int i = 0; i < len; i++){
-            if (i < 1){
-               cout << "number: " << vec[i] << " / level:" << level[i] << " / parent: none" << endl;
-            }
-            if(i >= 1){
-                cout << "number: " << vec[i] << " / level:" << level[i] << " / parent: " << parent[i] << endl;
-            }
+        
+        for(int i = 0; i < N; i++){
+            cout << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
+            
         
         }
     }
@@ -320,6 +311,7 @@ int main(){
 
     //g.find_degrees();
     g.DFS(3);
+    g.BFS(3);
     
     std::ifstream myfile; 
     myfile.open("Grafo.txt");
