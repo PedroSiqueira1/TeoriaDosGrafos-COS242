@@ -100,7 +100,7 @@ private:
     int M = 0;
     double sum = 0;
     string str;
-    list<pair<int, int>> *L;
+    list<pair<int, float>> *L;
     bool* visited;
     int* parent;
     int* level;
@@ -113,11 +113,11 @@ public:
     AdjListGraphW(string str){
         this->str = str;
         this->M = 0;
-        vector<int> nums;
+        vector<float> nums;
         
         stringstream stream(str);
         while(1) { // Pega os números entre os espaços
-            int n;
+            float n;
             stream >> n;
             if(!stream)
                 break;
@@ -125,16 +125,17 @@ public:
         }
         
         N = nums[0] + 1;
-        //cout << N;
-        L = new list<pair<int,int>>[N, N];
+        
+        L = new list<pair<int,float>>[N, N];
         int len = nums.size();
-        int x,y,z = 0;
+        int x,y;
+        float z = 0;
         for(int i = 1; i < len; i = i + 3){
             x = nums[i];
             int k = i + 1;
             y = nums[k];
             z = nums[k + 1];
-            //cout << x << " and " << y << " and " << z << endl;
+            
             L[x].push_back(make_pair(y,z));
             L[y].push_back(make_pair(x,z));
             
@@ -144,7 +145,8 @@ public:
 
 
     void printList(){
-        int s, r;
+        int s;
+        float r;
         for(int i = 0; i < N+1; i++){
                 cout << "N: " << i << " -> | ";
             for(auto vals = L[i].begin(); vals != L[i].end(); vals++){
@@ -179,9 +181,9 @@ public:
         }
     }
 
-    int minDistance(int dist[], bool Set[]){
+    int minDistance(float dist[], bool Set[]){
         
-        int min = INT_MAX, min_index; // Initialize min value
+        float min = INT_MAX, min_index; // Initialize min value
     
         for (int v = 0; v < N; v++)
             if (Set[v] == false && dist[v] <= min)
@@ -193,8 +195,9 @@ public:
 
     void dijkstra(int src){
 
-        int vertice, weight;
-        int dist[N]; //Distância do vertice inicial até o vertice escolhido
+        int vertice;
+        float weight;
+        float dist[N]; //Distância do vertice inicial até o vertice escolhido
     
         bool Set[N]; // True para vertices explorados
     
@@ -297,7 +300,7 @@ public:
 int main(){
 
     string s = "11\n11 10 1\n3 4 2\n5 7 3\n10 2 4\n1 3 5\n1 11 6\n10 1 7";
-    string a = "7\n1 2 1\n1 4 4\n1 5 2\n2 4 2\n5 4 2\n2 3 4\n5 6 3\n3 4 1\n4 6 2\n3 7 2\n6 7 3\n";
+    string a = "7\n1 2 1.1\n1 4 4.1\n1 5 2.1\n2 4 2.1\n5 4 2.1\n2 3 4.1\n5 6 3.1\n3 4 1.1\n4 6 2.1\n3 7 2.1\n6 7 3.1";
     
     int min = INT_MAX, min_index;
     cout << min_index << '\n';
@@ -305,8 +308,8 @@ int main(){
     //AdjMatrGraphW g(s);
     AdjListGraphW f(a);
     //g.printMat();
-    // f.printList();
-    f.dijkstra(1);
-    f.BFS(1);
+    //f.printList();
+    //f.dijkstra(1);
+    //f.BFS(1);
     return 0;
 }
