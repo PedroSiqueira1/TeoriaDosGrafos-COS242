@@ -194,9 +194,13 @@ public:
                     isThereNeg = true;
                 }
                 
-                L[x].push_back(make_pair(y,z));
-                L[y].push_back(make_pair(x,z));
-                
+                if(isDir){
+                    L[x].push_back(make_pair(y,z));
+                }
+                else{
+                    L[x].push_back(make_pair(y,z));
+                    L[y].push_back(make_pair(x,z));
+                }
             }
             M = (len - 1)/3;
             this -> edges;         
@@ -317,7 +321,7 @@ public:
     }
     
     void bellman(int src){
-        if(isDir = true){
+        if(isDir){
             float dist[N]; //Distância do vertice inicial até o vertice escolhido
         
             for (int i = 0; i < N; i++){
@@ -555,6 +559,7 @@ int main(){
     string s = "11\n11 10 1\n3 4 2\n5 7 3\n10 2 4\n1 3 5\n1 11 6\n10 1 7";
     string b = "7\n1 2\n1 4\n1 5\n2 4\n5 4\n2 3\n5 6\n3 4\n4 6\n3 7\n6 7";
     string a = "7\n1 2 1.1\n1 4 4.1\n1 5 2.1\n2 4 2.1\n5 4 2.1\n2 3 4.1\n5 6 3.1\n3 4 1.1\n4 6 2.1\n3 7 2.1\n6 7 3.1";
+    string k ="4\n0 1 1\n1 2 -1\n2 3 -1\n3 0 1";
 
 
 
@@ -565,9 +570,10 @@ int main(){
 
    
     f.printList();
+    f.bellman(0);
     //f.primMST(1);
     //f.dijkstra(1);
     //f.distance_to_all(1);
-    f.distance_from_to(1,7);
+    //f.distance_from_to(1,7);
     return 0;
 }
