@@ -1,5 +1,0 @@
-O grafo possui 6vértices 
-O grau mínimo é 1
-O grau máximo é 5
-A média dos graus é 3.66667
-A mediana dos graus é 4
