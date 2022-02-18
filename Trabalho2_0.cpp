@@ -562,6 +562,13 @@ int main(){
     string k ="4\n0 1 1\n1 2 -1\n2 3 -1\n3 0 1";
 
 
+    std::ifstream file("grafo_W_1_1.txt");
+    std::string temp;
+    while(std::getline(file, temp)) {
+        std::ifstream file("grafo_W_1_1.txt");
+        std::string temp;
+        std::getline(file, temp);
+    }
 
 
     //AdjMatrGraphW g(s);
@@ -575,5 +582,7 @@ int main(){
     //f.dijkstra(1);
     //f.distance_to_all(1);
     //f.distance_from_to(1,7);
+        
+    
     return 0;
 }
