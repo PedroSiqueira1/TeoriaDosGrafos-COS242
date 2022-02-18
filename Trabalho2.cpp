@@ -230,7 +230,7 @@ public:
                     if (!Set[vertice] && dist[u] != INT_MAX && dist[u] + weight < dist[vertice]){
                         dist[vertice] = dist[u] + weight;
                     }
-                }
+            }
 
             
         }
@@ -294,7 +294,80 @@ public:
             cout << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
         }
     }
+
+    int minKey(float key[], bool checked[]){
+        int min = INT_MAX, min_index;
     
+        for (int v = 0; v < N; v++)
+            if (checked[v] == false && key[v] < min)
+                min = key[v], min_index = v;
+    
+        return min_index;
+    }
+
+
+    void primMST(){
+
+        int vertice;
+        float weight;
+
+        int parentMST[N];
+        float custoMST[N];
+        bool mstSet[N];
+    
+      
+        for (int i = 0; i < N; i++){
+            custoMST[i] = INT_MAX, mstSet[i] = false;
+        }    
+
+        custoMST[1] = 0;
+        parentMST[1] = -1; // Primeiro nó é a raiz
+
+        for (int count = 0; count < N - 1; count++){
+            // Pick the minimum key vertex from the
+            // set of vertices not yet included in MST
+            int u = minKey(custoMST, mstSet);
+            // Add the picked vertex to the MST Set
+            mstSet[u] = true;
+
+
+            for(auto vals = L[u].begin(); vals != L[u].end(); vals++){ // Percorre os vizinhos de u
+                    
+                
+                vertice = vals -> first;
+                weight = vals -> second;
+                
+            
+                if (mstSet[vertice] == false && weight < custoMST[vertice]){
+                    parentMST[vertice] = u, custoMST[vertice] = weight;
+                }
+            }
+        }
+    
+
+        cout<<"Edge \tWeight\n";
+
+        for (int i = 1; i < N; i++){
+
+            for(auto vals = L[i].begin(); vals != L[i].end(); vals++){ // Percorre os vizinhos de u
+                    
+                
+                vertice = vals -> first;
+                weight = vals -> second;
+
+                //cout << vertice << '\n';
+                //cout << parentMST[i] << '\n';
+                
+                
+                if(vertice == parentMST[i]){
+
+                    cout<<parentMST[i]<<" - "<<i<<" \t"<< weight <<" \n";
+                }
+            
+                
+            }
+        }
+    }
 };
 
 int main(){
@@ -308,7 +381,7 @@ int main(){
     //AdjMatrGraphW g(s);
     AdjListGraphW f(a);
     //g.printMat();
-    //f.printList();
+    f.primMST();
     //f.dijkstra(1);
     //f.BFS(1);
     return 0;
