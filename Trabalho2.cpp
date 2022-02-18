@@ -11,8 +11,47 @@
 
 
 
+
 using namespace std;
 
+
+int nthOccurrence(string& str, string findMe, int nth){
+        
+        size_t  pos = 0;
+        int     cnt = 0;
+
+        while( cnt != nth )
+        {
+            pos+=1;
+            pos = str.find(findMe, pos);
+            if ( pos == string::npos )
+                return -1;
+            cnt++;
+        }
+        return pos;
+}
+
+ //Pega os números entre "\n" para verificar se o grafo tem peso ou não, se possuir 3 números entre os "\n" ele tem peso.
+bool is_weighted_graph(string str){
+    string sub = str.substr(nthOccurrence(str, "\n", 1) + 1 ,nthOccurrence(str, "\n", 2) - 2  );
+
+    vector<float> numbers;
+    stringstream stream(sub);
+    while(1) { // Pega os números entre os espaços
+        float n;
+        stream >> n;
+        if(!stream)
+            break;
+        numbers.push_back(n);
+    }
+
+    if (numbers.size() == 3){
+        return true;
+    }
+    else{
+        return false;
+    }
+};
 
 class AdjMatrGraphW{
     private:
@@ -93,7 +132,7 @@ class AdjMatrGraphW{
 
 class AdjListGraphW{
 private:
-
+    bool weighted_graph;
     int min_degree;
     int max_degree = 0;
     vector<int> degrees;
@@ -101,16 +140,24 @@ private:
     double sum = 0;
     string str;
     list<pair<int, float>> *L;
+    list<int> *L_no_weight;
     bool* visited;
     int* parent;
+    int* parentMST;
     int* level;
-    int* parentdfs;
-    int* leveldfs;
+    float* dist;
     list<int> components;
 
 public:
     int N;
+    void addEdge(vector <pair<int, float> > adj[], int u, int v, float wt){
+        adj[u].push_back(make_pair(v, wt));
+        adj[v].push_back(make_pair(u, wt));
+    }
+
     AdjListGraphW(string str){
+
+        weighted_graph = is_weighted_graph(str); 
         this->str = str;
         this->M = 0;
         vector<float> nums;
@@ -124,62 +171,85 @@ public:
             nums.push_back(n);
         }
         
-        N = nums[0] + 1;
+        if (weighted_graph == true) {
+            N = nums[0] + 1;
         
-        L = new list<pair<int,float>>[N, N];
-        int len = nums.size();
-        int x,y;
-        float z = 0;
-        for(int i = 1; i < len; i = i + 3){
-            x = nums[i];
-            int k = i + 1;
-            y = nums[k];
-            z = nums[k + 1];
-            
-            L[x].push_back(make_pair(y,z));
-            L[y].push_back(make_pair(x,z));
-            
+            L = new list<pair<int,float>>[N, N];
+            int len = nums.size();
+            int x,y;
+            float z = 0;
+            for(int i = 1; i < len; i = i + 3){
+                x = nums[i];
+                int k = i + 1;
+                y = nums[k];
+                z = nums[k + 1];
+                
+                L[x].push_back(make_pair(y,z));
+                L[y].push_back(make_pair(x,z));
+                
+            }
+            M = (len - 1)/2;
+
         }
-        M = (len - 1)/2;
+
+        if (weighted_graph == false) {
+
+            N = nums[0] + 1;
+            L_no_weight = new list<int>[N];
+            int len = nums.size();
+            int x,y = 0;
+            for(int i = 1; i < len; i = i + 2){
+                x = nums[i];
+                int k = i + 1;
+                y = nums[k];
+                L_no_weight[x].push_back(y);
+                L_no_weight[y].push_back(x);
+            }
+            M = (len - 1)/2;
+        }
+
+        
+        
     }
 
+    
 
     void printList(){
-        int s;
-        float r;
-        for(int i = 0; i < N+1; i++){
-                cout << "N: " << i << " -> | ";
-            for(auto vals = L[i].begin(); vals != L[i].end(); vals++){
-                
-                s = vals -> first;
-                r = vals -> second;
-                cout << s << " de peso: " << r << " | ";
+
+
+        if (weighted_graph == true){
+
+        
+            int s;
+            float r;
+            for(int i = 1; i < N; i++){
+                    cout << "N: " << i << " -> | ";
+                for(auto vals = L[i].begin(); vals != L[i].end(); vals++){
+                    
+                    s = vals -> first;
+                    r = vals -> second;
+                    cout << s << " de peso: " << r << " | ";
+                }
+
+                cout << endl;
             }
-
-            cout << endl;
         }
 
-    }
+        if (weighted_graph == false) {
 
-    void numOfEdges(){
-        cout << "M is " << M << '\n';
-    }
-
-    double findMean(){
-        return sum/N;
-    }
-
-
-
-    int findMedian(){
-        std::sort(std::begin(degrees), std::end(degrees));
-        if (N % 2 != 0){
-            return degrees.at(N / 2);
+            for(int i = 0; i < N; i++){
+                    cout << "N: " << i << " -> | ";
+                for(int x:L_no_weight[i]){
+                    cout << x <<" | ";
+                }
+                
+                cout << endl;
+            }
         }
-        else{
-            return degrees.at((((N - 1) / 2) + degrees.at(N / 2)) / 2);
-        }
+        
+
     }
+
 
     int minDistance(float dist[], bool Set[]){
         
@@ -197,7 +267,8 @@ public:
 
         int vertice;
         float weight;
-        float dist[N]; //Distância do vertice inicial até o vertice escolhido
+        dist = new float[N]; //Distância do vertice inicial até o vertice escolhido
+       // float dist[N]; 
     
         bool Set[N]; // True para vertices explorados
     
@@ -211,12 +282,9 @@ public:
 
             // Menor distancia entre os vertice ainda não explorados
             // u = src na primeira iteração
-
-
             int u = minDistance(dist, Set);
             
             Set[u] = true;
-
     
             for(auto vals = L[u].begin(); vals != L[u].end(); vals++){ // Percorre os vizinhos de u
                     
@@ -224,9 +292,7 @@ public:
                     vertice = vals -> first;
                     weight = vals -> second;
                    
-                    // Update dist[v] only if is not in sptSet, there is an edge from
-                    // u to v, and total weight of path from src to  v through u is
-                    // smaller than current value of dist[v]
+                    
                     if (!Set[vertice] && dist[u] != INT_MAX && dist[u] + weight < dist[vertice]){
                         dist[vertice] = dist[u] + weight;
                     }
@@ -234,14 +300,9 @@ public:
 
             
         }
-
-        cout <<"Vertice \t Distância da Origem" << endl;
-        for (int i = 0; i < N; i++)
-        cout  << i << " \t\t"<<dist[i]<< endl;
     }
 
     void BFS(int value){
-        int vertice;
         visited = new bool[N];
         parent = new int[N];
         level = new int[N];
@@ -266,17 +327,16 @@ public:
             int v = Q.front();
             Q.pop_front();
             //para todo vizinho w de v:
-            for(auto vals = L[v].begin(); vals!=L[v].end(); vals++){
-
-                vertice = vals -> first;
+            for(i = L_no_weight[v].begin(); i!=L_no_weight[v].end(); i++){
+                int w = *i;
                 //Se não estiver nos visitados
-                if(!visited[vertice]){
+                if(!visited[w]){
                     //Marca como visitado
-                     visited[vertice] = true;
+                     visited[w] = true;
                      //Coloca no Q
-                     Q.push_back(vertice);
-                     parent[vertice] = v;
-                     level[vertice] = level[v] + 1;
+                     Q.push_back(w);
+                     parent[w] = v;
+                     level[w] = level[v] + 1;
                 }
             }
         }
@@ -290,9 +350,8 @@ public:
             }
         }
             
-        for(int i = 0; i < N; i++){
-            cout << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
-        }
+
+
     }
 
     int minKey(float key[], bool checked[]){
@@ -306,12 +365,13 @@ public:
     }
 
 
-    void primMST(){
+    void primMST(int num){
 
         int vertice;
         float weight;
+        float total_weight = 0.0;
 
-        int parentMST[N];
+        parentMST = new int[N];
         float custoMST[N];
         bool mstSet[N];
     
@@ -320,14 +380,13 @@ public:
             custoMST[i] = INT_MAX, mstSet[i] = false;
         }    
 
-        custoMST[1] = 0;
-        parentMST[1] = -1; // Primeiro nó é a raiz
+        custoMST[num] = 0;
+        parentMST[num] = -1; // Primeiro nó é a raiz
 
         for (int count = 0; count < N - 1; count++){
-            // Pick the minimum key vertex from the
-            // set of vertices not yet included in MST
+            
             int u = minKey(custoMST, mstSet);
-            // Add the picked vertex to the MST Set
+      
             mstSet[u] = true;
 
 
@@ -344,45 +403,107 @@ public:
             }
         }
     
+        
+        
+        ofstream answer;
+        answer.open("MST.txt");
+        if (answer.is_open()){
 
-        cout<<"Edge \tWeight\n";
+            answer<<"Edge \tWeight\n";
 
-        for (int i = 1; i < N; i++){
+            for (int i = 1; i < N; i++){
 
-            for(auto vals = L[i].begin(); vals != L[i].end(); vals++){ // Percorre os vizinhos de u
+                for(auto vals = L[i].begin(); vals != L[i].end(); vals++){ // Percorre os vizinhos de u
+                        
                     
-                
-                vertice = vals -> first;
-                weight = vals -> second;
+                    vertice = vals -> first;
+                    weight = vals -> second;
 
-                //cout << vertice << '\n';
-                //cout << parentMST[i] << '\n';
-                
-                
-                if(vertice == parentMST[i]){
 
-                    cout<<parentMST[i]<<" - "<<i<<" \t"<< weight <<" \n";
+                    if(vertice == parentMST[i]){
+                        
+                        total_weight += weight;
+                        answer<<parentMST[i]<<" - "<<i<<" \t"<< weight <<" \n";
+                    }
+                    
                 }
-            
-                
+            }
+        answer << "Peso total = " << total_weight << endl;
+        }
+        
+    }
+
+
+    void distance_to_all(int num){
+
+        if(weighted_graph == false){
+            BFS(num);
+            for(int i = 0; i < N; i++){
+                cout << "number: " << i << " / level:" << level[i] << " / parent: " << parent[i] << endl;
             }
         }
+
+        if(weighted_graph == true){
+            dijkstra(num);
+            cout <<"Vertice \t Distância da Origem" << endl;
+            for (int i = 0; i < N; i++){
+                cout  << i << " \t\t"<<dist[i]<< endl;
+            }
+        }
+
+    }
+
+    void distance_from_to(int num1, int num2){
+        if(weighted_graph == false){
+            int x;
+            BFS(num1);
+            cout <<"Distância de " << num1 << " até " << num2 << " é: " << level[num2] <<endl;
+
+            x = num2;
+            cout << x;
+            while (parent[x] != -1){
+                cout<< "--"<< parent[x];
+                x = parent[x];
+            }
+        }
+
+        if(weighted_graph == true){
+            int x;
+            dijkstra(num1);
+            cout <<"Distância de " << num1 << " até " << num2 << " é: " << dist[num2] <<endl;
+
+            primMST(num1);
+            x = num2;
+            cout<<x;
+            while (parentMST[x] != -1){
+                cout<< "--"<< parentMST[x];
+                x = parentMST[x];
+            }
+            
+        }
+
     }
 };
+
 
 int main(){
 
     string s = "11\n11 10 1\n3 4 2\n5 7 3\n10 2 4\n1 3 5\n1 11 6\n10 1 7";
+    string b = "7\n1 2\n1 4\n1 5\n2 4\n5 4\n2 3\n5 6\n3 4\n4 6\n3 7\n6 7";
     string a = "7\n1 2 1.1\n1 4 4.1\n1 5 2.1\n2 4 2.1\n5 4 2.1\n2 3 4.1\n5 6 3.1\n3 4 1.1\n4 6 2.1\n3 7 2.1\n6 7 3.1";
-    
-    int min = INT_MAX, min_index;
-    cout << min_index << '\n';
+
+
+
 
     //AdjMatrGraphW g(s);
     AdjListGraphW f(a);
-    //g.printMat();
-    f.primMST();
+    
+
+   
+    f.printList();
+    //f.primMST(1);
     //f.dijkstra(1);
-    //f.BFS(1);
+    //f.distance_to_all(1);
+    f.distance_from_to(1,7);
     return 0;
 }
