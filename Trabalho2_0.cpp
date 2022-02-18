@@ -562,22 +562,22 @@ int main(){
     string k ="4\n0 1 1\n1 2 -1\n2 3 -1\n3 0 1";
 
 
-    std::ifstream file("grafo_W_1_1.txt");
-    std::string temp;
-    while(std::getline(file, temp)) {
-        std::ifstream file("grafo_W_1_1.txt");
-        std::string temp;
-        std::getline(file, temp);
+    string grafo;
+    char ch;
+    fstream fin("Grafo.txt", fstream::in);
+    while (fin >> noskipws >> ch) {
+        grafo += ch; // Or whatever
     }
-
-
+    AdjListGraphW f(grafo);
     //AdjMatrGraphW g(s);
-    AdjListGraphW f(a);
+
     
 
-   
+    
+    
+
     f.printList();
-    f.bellman(0);
+    //f.bellman(0);
     //f.primMST(1);
     //f.dijkstra(1);
     //f.distance_to_all(1);
